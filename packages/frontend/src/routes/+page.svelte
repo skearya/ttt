@@ -58,15 +58,13 @@
 </script>
 
 <section class="flex h-screen items-center justify-center">
-	<div class="flex h-96 rounded-xl border p-6">
+	<div class="flex h-96 flex-col rounded-xl border p-6 sm:flex-row">
 		<div class="w-64 space-y-2">
 			<h1 class="text-3xl font-bold">ttc</h1>
 			<Dialog.Root>
-				<Dialog.Trigger class="w-full">
-					<div class="bg-accent flex items-center justify-between rounded-md p-3">
-						<h1>Create Room</h1>
-						<Plus size="25" />
-					</div>
+				<Dialog.Trigger class="bg-accent flex w-full items-center justify-between rounded-md p-3">
+					<h1>Create Room</h1>
+					<Plus size="25" />
 				</Dialog.Trigger>
 				<Dialog.Content>
 					<Dialog.Header>
@@ -89,38 +87,38 @@
 					</Dialog.DialogFooter>
 				</Dialog.Content>
 			</Dialog.Root>
-			<div class="bg-accent flex items-center justify-between rounded-md p-3">
-				<Dialog.Root bind:open={usernameDialog}>
-					<Dialog.Trigger>Change Username</Dialog.Trigger>
-					<Dialog.Content>
-						<Dialog.Header>
-							<Dialog.Title>Change Username</Dialog.Title>
-						</Dialog.Header>
-						<Input
-							id="room"
-							placeholder="username"
-							bind:value={usernameInput}
-							on:keydown={(e) => {
-								if (e.key == 'Enter') setUsername();
-							}}
-						/>
-						<Dialog.DialogFooter>
-							<Button on:click={setUsername}>Change</Button>
-						</Dialog.DialogFooter>
-					</Dialog.Content>
-				</Dialog.Root>
-				<Pencil size="25" />
-			</div>
+			<Dialog.Root bind:open={usernameDialog}>
+				<Dialog.Trigger class="bg-accent flex w-full items-center justify-between rounded-md p-3">
+					<h1>Change Username</h1>
+					<Pencil size="25" />
+				</Dialog.Trigger>
+				<Dialog.Content>
+					<Dialog.Header>
+						<Dialog.Title>Change Username</Dialog.Title>
+					</Dialog.Header>
+					<Input
+						id="room"
+						placeholder="username"
+						bind:value={usernameInput}
+						on:keydown={(e) => {
+							if (e.key == 'Enter') setUsername();
+						}}
+					/>
+					<Dialog.DialogFooter>
+						<Button on:click={setUsername}>Change</Button>
+					</Dialog.DialogFooter>
+				</Dialog.Content>
+			</Dialog.Root>
 		</div>
 
-		<Separator orientation="vertical" class="mx-5"></Separator>
+		<Separator class="my-5 h-[1px] w-full sm:mx-5 sm:my-0 sm:h-full sm:w-[1px]"></Separator>
 
-		<div class="h-full w-56 space-y-2 overflow-auto">
+		<div class="h-full space-y-2 overflow-auto sm:w-56">
 			<h1 class="text-lg font-semibold">Public Rooms</h1>
 			{#each Object.entries(data.rooms) as [room, players]}
-				<a href={room} class="flex justify-between rounded-md border p-2 text-sm">
-					<h1>{room.substring(1)}</h1>
-					<h1 class="text-muted-foreground">{players}/2</h1>
+				<a href={room} class="flex w-full justify-between rounded-md border p-2 text-sm">
+					<h1 class="overflow-hidden text-ellipsis">{room.substring(1)}</h1>
+					<h1>{players}/2</h1>
 				</a>
 			{:else}
 				<h1>none :(</h1>

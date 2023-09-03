@@ -59,6 +59,12 @@ app.post("/createRoom", (req, res) => {
             message: "Bad room name",
         });
     }
+    if ((req.body.name as string).length > 12) {
+        return res.status(400).json({
+            type: "error",
+            message: "Room name too long",
+        });
+    }
 
     data[`/${req.body.name}`] = {
         public: req.body.public,

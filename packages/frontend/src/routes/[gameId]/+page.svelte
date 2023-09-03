@@ -6,14 +6,17 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { Loader } from 'lucide-svelte';
+	import { Loader, Menu } from 'lucide-svelte';
+	import { flyAndScale } from '$lib/utils.js';
+	import Toggle from '$lib/components/ui/toggle/toggle.svelte';
 
 	export let data;
 	let players: Array<string> = [];
 	let gameData: GameData;
 	let username = localStorage.getItem('username');
-	let open: boolean = false;
 	let usernameInput: string = '';
+	let usernameDialog: boolean = false;
+	let menu: boolean = window.innerWidth > 768;
 
 	function setUsername() {
 		if (usernameInput == '') {
@@ -23,7 +26,7 @@
 		username = usernameInput;
 		localStorage.setItem('username', username);
 		socket.auth = { username };
-		open = false;
+		usernameDialog = false;
 		socket.connect();
 	}
 
@@ -38,7 +41,7 @@
 	);
 
 	if (username == null) {
-		open = true;
+		usernameDialog = true;
 	} else {
 		socket.connect();
 	}
@@ -58,83 +61,111 @@
 	});
 </script>
 
-<section class="flex h-screen items-center justify-center">
-	<Dialog.Root bind:open>
-		<Dialog.Content>
-			<Dialog.Header>
-				<Dialog.Title>Choose a username</Dialog.Title>
-			</Dialog.Header>
-			<Input
-				bind:value={usernameInput}
-				placeholder="username"
-				on:keydown={(e) => {
-					if (e.key == 'Enter') setUsername();
-				}}
-			/>
-			<Dialog.DialogFooter>
-				<Button on:click={setUsername}>Join</Button>
-			</Dialog.DialogFooter>
-		</Dialog.Content>
-	</Dialog.Root>
-
+<section class="flex h-screen">
 	{#if gameData}
-		<div class="rounded-xl border p-6">
-			{#if gameData.currentTurn}
-				<div class="flex items-center justify-between text-2xl">
-					<h1>Current Turn</h1>
-					<h1>{gameData.currentTurn}</h1>
-				</div>
-			{/if}
+		<Toggle
+			aria-label="toggle menu"
+			class="absolute right-2 top-2"
+			bind:pressed={menu}
+			on:click={() => (menu = !menu)}
+		>
+			<Menu class="h-4 w-4" />
+		</Toggle>
+		{#if menu}
+			<div
+				transition:flyAndScale={{ x: -100, y: 0, start: 1 }}
+				class="bg-background absolute flex h-full w-[20rem] flex-col border p-6 md:static"
+			>
+				<button
+					title="Copy link"
+					class="w-full overflow-hidden text-ellipsis whitespace-nowrap text-left text-xl font-bold"
+					on:click={async () => {
+						await navigator.clipboard.writeText(window.location.href);
+					}}
+				>
+					{window.location.href}
+				</button>
 
-			<Separator class="my-5"></Separator>
+				<Separator class="my-3"></Separator>
 
-			<div class="bg-accent grid h-72 w-72 max-w-sm grid-cols-3 grid-rows-3 gap-[2px]">
-				{#each gameData?.board || [] as row, r}
-					{#each row as col, c}
-						{#if col !== ''}
-							<button class="bg-background text-3xl">
-								{col}
-							</button>
-						{:else}
-							<button
-								class="bg-background"
-								on:click={() => {
-									socket.emit('boardUpdate', {
-										row: r,
-										col: c
-									});
-								}}
-							></button>
-						{/if}
-					{/each}
-				{/each}
-			</div>
-
-			<Separator class="my-5"></Separator>
-
-			<h1 class="text-xl font-bold">{username}</h1>
-			<div class="flex space-x-2 text-sm">
-				<h1>Players:</h1>
+				{#if gameData.rematches > 0}
+					<h1 class="font-semibold">Rematches: {gameData.rematches}</h1>
+				{/if}
+				<h1 class="font-semibold">Players</h1>
 				{#each players as player}
-					<h3>{player}</h3>
+					<h1>{player}</h1>
 				{/each}
-			</div>
 
-			{#if gameData.status.over}
-				<Separator class="my-4"></Separator>
-				<div class="mb-4 flex justify-between text-2xl">
-					<h1>Winner</h1>
-					<h1>{gameData.status.winner}</h1>
+				<a href="/" class="mt-auto">home</a>
+			</div>
+		{/if}
+
+		<div class="flex w-full items-center justify-center">
+			<div class="rounded-xl border p-6">
+				{#if gameData.currentTurn}
+					<div class="flex items-center justify-between text-2xl">
+						<h1>Current Turn</h1>
+						<h1>{gameData.currentTurn}</h1>
+					</div>
+				{/if}
+
+				<Separator class="my-5"></Separator>
+
+				<div class="bg-accent grid h-72 w-72 max-w-sm grid-cols-3 grid-rows-3 gap-[2px]">
+					{#each gameData?.board || [] as row, r}
+						{#each row as col, c}
+							{#if col !== ''}
+								<button class="bg-background text-3xl">
+									{col}
+								</button>
+							{:else}
+								<button
+									class="bg-background"
+									on:click={() => {
+										socket.emit('boardUpdate', {
+											row: r,
+											col: c
+										});
+									}}
+								></button>
+							{/if}
+						{/each}
+					{/each}
 				</div>
-				<Button on:click={() => socket.emit('rematch')} class="w-full bg-gray-300">
-					rematch? (votes: {gameData.status.rematchVotes}/2)
-				</Button>
-			{/if}
-			{#if gameData.rematches > 0}
-				<h1 class="text-sm">Rematches: {gameData.rematches}</h1>
-			{/if}
+
+				{#if gameData.status.over}
+					<Separator class="my-4"></Separator>
+					<div class="mb-4 flex justify-between text-2xl">
+						<h1>Winner</h1>
+						<h1>{gameData.status.winner}</h1>
+					</div>
+					<Button on:click={() => socket.emit('rematch')} class="w-full bg-gray-300">
+						rematch? (votes: {gameData.status.rematchVotes}/2)
+					</Button>
+				{/if}
+			</div>
 		</div>
-	{:else if !gameData && !open}
-		<Loader></Loader>
+	{:else if !gameData && !usernameDialog}
+		<div class="flex h-full w-full items-center justify-center">
+			<Loader></Loader>
+		</div>
 	{/if}
 </section>
+
+<Dialog.Root bind:open={usernameDialog}>
+	<Dialog.Content>
+		<Dialog.Header>
+			<Dialog.Title>Choose a username</Dialog.Title>
+		</Dialog.Header>
+		<Input
+			bind:value={usernameInput}
+			placeholder="username"
+			on:keydown={(e) => {
+				if (e.key == 'Enter') setUsername();
+			}}
+		/>
+		<Dialog.DialogFooter>
+			<Button on:click={setUsername}>Join</Button>
+		</Dialog.DialogFooter>
+	</Dialog.Content>
+</Dialog.Root>
