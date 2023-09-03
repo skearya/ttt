@@ -1,7 +1,3 @@
-import cors from "cors";
-import express from "express";
-import { createServer } from "http";
-import { Server } from "socket.io";
 import type {
     ClientToServerEvents,
     ServerToClientEvents,
@@ -9,6 +5,10 @@ import type {
     SocketData,
     GameData,
 } from "@ttt/types/index";
+import cors from "cors";
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import { checkWinner } from "./helpers";
 
 const port = 3000;
@@ -32,6 +32,7 @@ const io = new Server<
 let data: {
     [namespace: string]: GameData;
 } = {};
+// need to remove dead namespaces from data
 
 app.get("/rooms", (_req, res) => {
     let rooms: Record<string, number> = {};
@@ -121,6 +122,9 @@ parentNamespace.on("connection", (socket) => {
             return;
         }
         if (data[socket.nsp.name].currentTurn !== socket.data.playerType) {
+            return;
+        }
+        if (data[socket.nsp.name].status.over == true) {
             return;
         }
 

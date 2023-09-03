@@ -4,7 +4,6 @@ interface ServerToClientEvents {
 }
 
 interface ClientToServerEvents {
-    hello: () => void;
     boardUpdate: (update: { row: number; col: number }) => void;
     rematch: () => void;
 }

@@ -18,8 +18,9 @@
 		"autoprefixer": "^10.4.14",
 		"postcss": "^8.4.24",
 		"postcss-load-config": "^4.0.1",
-		"prettier": "^2.8.0",
-		"prettier-plugin-svelte": "^2.10.1",
+		"prettier": "^3.0.3",
+		"prettier-plugin-svelte": "^3.0.3",
+		"prettier-plugin-tailwindcss": "^0.5.4",
 		"socket.io-client": "^4.7.2",
 		"svelte": "^4.0.5",
 		"svelte-check": "^3.4.3",
@@ -32,5 +33,13 @@
 	"description": "Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).",
 	"main": "svelte.config.js",
 	"author": "",
-	"license": "ISC"
+	"license": "ISC",
+	"dependencies": {
+		"@fontsource-variable/inter": "^5.0.8",
+		"bits-ui": "^0.5.6",
+		"clsx": "^2.0.0",
+		"lucide-svelte": "^0.274.0",
+		"tailwind-merge": "^1.14.0",
+		"tailwind-variants": "^0.1.14"
+	}
 }
