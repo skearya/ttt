@@ -1,5 +1,5 @@
 interface ServerToClientEvents {
-    players: (map: any) => void;
+    players: (map: Array<string>) => void;
     data: (game: GameData) => void;
 }
 

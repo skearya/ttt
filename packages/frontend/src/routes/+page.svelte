@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SERVER_URL } from '$env/static/public';
 	import { goto } from '$app/navigation';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Input } from '$lib/components/ui/input';
@@ -31,7 +32,7 @@
 		}
 
 		let response: CreateRoomResponse = await (
-			await fetch('http://localhost:3000/createRoom', {
+			await fetch(`${SERVER_URL}/createRoom`, {
 				method: 'POST',
 				headers: {
 					Accept: 'application/json',

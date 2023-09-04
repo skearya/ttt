@@ -1,14 +1,15 @@
 <script lang="ts">
 	import type { ServerToClientEvents, ClientToServerEvents, GameData } from '@ttt/types/index';
+	import { SERVER_URL } from '$env/static/public';
 	import { onDestroy } from 'svelte';
 	import { io, Socket } from 'socket.io-client';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
+	import { Toggle } from '$lib/components/ui/toggle';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { Loader, Menu } from 'lucide-svelte';
 	import { flyAndScale } from '$lib/utils.js';
-	import Toggle from '$lib/components/ui/toggle/toggle.svelte';
 
 	export let data;
 	let players: Array<string> = [];
@@ -31,7 +32,7 @@
 	}
 
 	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-		`http://localhost:3000/${data.gameId}`,
+		`${SERVER_URL}/${data.gameId}`,
 		{
 			auth: {
 				username

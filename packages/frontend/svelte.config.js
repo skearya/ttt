@@ -15,6 +15,10 @@ const config = {
 		alias: {
 			components: "$lib/components",
 			utils: "$lib/utils"
+		},
+		env: {
+			dir: "../../",
+			publicPrefix: ""
 		}
 	}
 };

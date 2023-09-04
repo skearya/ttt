@@ -5,15 +5,17 @@ import type {
     SocketData,
     GameData,
 } from "@ttt/types/index";
+import dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { checkWinner } from "./helpers";
 
+dotenv.config({ path: "../../.env" });
 const port = 3000;
 const app = express()
-    .use(cors({ origin: "http://localhost:5173" }))
+    .use(cors({ origin: process.env.FRONTEND_URL }))
     .use(express.json());
 const httpServer = createServer(app);
 const io = new Server<
@@ -24,7 +26,7 @@ const io = new Server<
 >(httpServer, {
     serveClient: false,
     cors: {
-        origin: ["http://localhost:5173"],
+        origin: [process.env.FRONTEND_URL!],
     },
     cleanupEmptyChildNamespaces: true,
 });
@@ -32,7 +34,6 @@ const io = new Server<
 let data: {
     [namespace: string]: GameData;
 } = {};
-// need to remove dead namespaces from data
 
 app.get("/rooms", (_req, res) => {
     let rooms: Record<string, number> = {};
@@ -180,6 +181,12 @@ parentNamespace.on("connection", (socket) => {
                 },
             };
             io.of(socket.nsp.name).emit("data", data[socket.nsp.name]);
+        }
+    });
+
+    socket.on("disconnect", () => {
+        if (io.of(socket.nsp.name).sockets.size == 0) {
+            delete data[socket.nsp.name];
         }
     });
 });
