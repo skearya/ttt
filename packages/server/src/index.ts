@@ -191,6 +191,6 @@ parentNamespace.on("connection", (socket) => {
     });
 });
 
-httpServer.listen(port, "localhost", () => {
+httpServer.listen(port, () => {
     console.log(`http://localhost:${port}/`);
 });
