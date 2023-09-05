@@ -9,7 +9,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Toggle } from '$lib/components/ui/toggle';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { Loader, Menu } from 'lucide-svelte';
+	import { Github, Loader, Menu } from 'lucide-svelte';
 	import { flyAndScale } from '$lib/utils.js';
 
 	export let data;
@@ -101,7 +101,12 @@
 					<h1>{player}</h1>
 				{/each}
 
-				<a href="/" class="mt-auto">home</a>
+				<div class="mt-auto flex w-full justify-between">
+					<a href="/">home</a>
+					<a href="https://github.com/skearya/ttt">
+						<Github size="25" />
+					</a>
+				</div>
 			</div>
 		{/if}
 

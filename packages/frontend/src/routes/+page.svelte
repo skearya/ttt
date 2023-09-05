@@ -8,7 +8,7 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import { Pencil, Plus } from 'lucide-svelte';
+	import { Github, Pencil, Plus } from 'lucide-svelte';
 
 	export let data;
 	let roomName: string = '';
@@ -70,7 +70,7 @@
 
 <section class="flex h-screen items-center justify-center">
 	<div class="flex h-96 flex-col rounded-xl border p-6 sm:flex-row">
-		<div class="w-64 space-y-2">
+		<div class="flex w-64 flex-col gap-y-2">
 			<h1 class="text-3xl font-bold">ttc</h1>
 			<Dialog.Root>
 				<Dialog.Trigger class="bg-accent flex w-full items-center justify-between rounded-md p-3">
@@ -120,6 +120,9 @@
 					</Dialog.DialogFooter>
 				</Dialog.Content>
 			</Dialog.Root>
+			<a href="https://github.com/skearya/ttt" target="_blank" class="mt-auto w-min pt-3">
+				<Github size="25" />
+			</a>
 		</div>
 
 		<Separator class="my-5 h-[1px] w-full sm:mx-5 sm:my-0 sm:h-full sm:w-[1px]"></Separator>

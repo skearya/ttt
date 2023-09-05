@@ -4,6 +4,10 @@
 	import { Toaster } from 'svelte-sonner';
 </script>
 
+<svelte:head>
+	<title>ttt</title>
+</svelte:head>
+
 <slot />
 
 <Toaster theme="dark" />

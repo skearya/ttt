@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@ttt/types": "^1.0.0",
+    "@types/express": "^4.17.17",
     "tsx": "^3.12.7",
     "typescript": "^5.2.2"
   }
