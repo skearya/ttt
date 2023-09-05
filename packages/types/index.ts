@@ -1,6 +1,7 @@
 interface ServerToClientEvents {
     players: (map: Array<string>) => void;
     data: (game: GameData) => void;
+    error: (msg: string) => void;
 }
 
 interface ClientToServerEvents {

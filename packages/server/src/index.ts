@@ -129,6 +129,7 @@ parentNamespace.on("connection", (socket) => {
             return;
         }
         if (data[socket.nsp.name].currentTurn !== socket.data.playerType) {
+            socket.emit("error", "It's not your turn!");
             return;
         }
         if (data[socket.nsp.name].status.over == true) {
@@ -185,8 +186,20 @@ parentNamespace.on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
+        io.of(socket.nsp.name).emit(
+            "players",
+            Array.from(
+                io.of(socket.nsp.name).sockets,
+                ([_k, v]) => `${v.data.username} (${v.data.playerType})`
+            )
+        );
+
         if (io.of(socket.nsp.name).sockets.size == 0) {
-            delete data[socket.nsp.name];
+            setTimeout(() => {
+                if (io.of(socket.nsp.name).sockets.size == 0) {
+                    delete data[socket.nsp.name];
+                }
+            }, 5000);
         }
     });
 });

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { SERVER_URL } from '$env/static/public';
 	import { goto } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -28,6 +29,7 @@
 
 	async function createRoom() {
 		if (roomName == '') {
+			toast.warning('Input is empty');
 			return;
 		}
 
@@ -47,8 +49,16 @@
 
 		if (response.type == 'success') {
 			await goto(`/${response.room}`);
+			toast.success('Room Created', {
+				action: {
+					label: 'Copy Link',
+					onClick: async () => {
+						await navigator.clipboard.writeText(window.location.href);
+					}
+				}
+			});
 		} else {
-			alert(response.message);
+			toast.warning(response.message);
 		}
 	}
 

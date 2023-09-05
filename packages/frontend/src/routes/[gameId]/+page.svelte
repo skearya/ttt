@@ -3,6 +3,7 @@
 	import { SERVER_URL } from '$env/static/public';
 	import { onDestroy } from 'svelte';
 	import { io, Socket } from 'socket.io-client';
+	import { toast } from 'svelte-sonner';
 	import { Separator } from '$lib/components/ui/separator';
 	import { Input } from '$lib/components/ui/input';
 	import { Button } from '$lib/components/ui/button';
@@ -53,8 +54,11 @@
 	socket.on('data', (newData) => {
 		gameData = newData;
 	});
-	socket.on('connect_error', (err) => {
-		alert(err.message);
+	socket.on('connect_error', (msg) => {
+		alert(msg.message);
+	});
+	socket.on('error', (msg) => {
+		toast.error(msg);
 	});
 
 	onDestroy(() => {
@@ -84,7 +88,7 @@
 						await navigator.clipboard.writeText(window.location.href);
 					}}
 				>
-					{window.location.href}
+					{data.gameId}
 				</button>
 
 				<Separator class="my-3"></Separator>
