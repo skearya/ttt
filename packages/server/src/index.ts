@@ -124,6 +124,13 @@ parentNamespace.on("connection", (socket) => {
         )
     );
 
+    socket.on("messageSend", (content) => {
+        io.of(socket.nsp.name).emit("message", {
+            sender: socket.data.username,
+            content,
+        });
+    });
+
     socket.on("boardUpdate", ({ row, col }) => {
         if (data[socket.nsp.name].board[row][col] !== "") {
             return;

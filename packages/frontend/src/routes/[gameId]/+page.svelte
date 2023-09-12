@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ServerToClientEvents, ClientToServerEvents, GameData } from '@ttt/types/index';
 	import { SERVER_URL } from '$env/static/public';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, tick } from 'svelte';
 	import { io, Socket } from 'socket.io-client';
 	import { toast } from 'svelte-sonner';
 	import { Separator } from '$lib/components/ui/separator';
@@ -9,18 +9,21 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Toggle } from '$lib/components/ui/toggle';
 	import * as Dialog from '$lib/components/ui/dialog';
+	import * as Tabs from '$lib/components/ui/tabs';
 	import { Github, Loader, Menu } from 'lucide-svelte';
 	import { flyAndScale } from '$lib/utils.js';
 
 	export let data;
 	let players: Array<string> = [];
 	let gameData: GameData;
+	let messages: Array<Parameters<ServerToClientEvents['message']>[0]> = [];
 	let username = localStorage.getItem('username');
 	let usernameInput: string = '';
 	let usernameDialog: boolean = false;
+	let messageContent: string = '';
 	let menu: boolean = window.innerWidth > 768;
 
-	function setUsername() {
+	function setUsername(): void {
 		if (usernameInput == '') {
 			return;
 		}
@@ -30,6 +33,15 @@
 		socket.auth = { username };
 		usernameDialog = false;
 		socket.connect();
+	}
+
+	function sendMessage(): void {
+		if (messageContent == '') {
+			return;
+		}
+
+		socket.emit('messageSend', messageContent);
+		messageContent = '';
 	}
 
 	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
@@ -54,6 +66,14 @@
 	socket.on('data', (newData) => {
 		gameData = newData;
 	});
+	socket.on('message', async (message) => {
+		messages = [...messages, message];
+		await tick();
+		document.getElementById('messages')!.scroll({
+			top: document.getElementById('messages')!.scrollHeight
+		});
+	});
+
 	socket.on('connect_error', (msg) => {
 		alert(msg.message);
 	});
@@ -70,7 +90,7 @@
 	{#if gameData}
 		<Toggle
 			aria-label="toggle menu"
-			class="absolute right-2 top-2"
+			class="absolute right-2 top-2 z-50"
 			bind:pressed={menu}
 			on:click={() => (menu = !menu)}
 		>
@@ -79,7 +99,7 @@
 		{#if menu}
 			<div
 				transition:flyAndScale={{ x: -100, y: 0, start: 1 }}
-				class="bg-background absolute flex h-full w-[20rem] flex-col border p-6 md:static"
+				class="bg-background absolute flex h-full w-full flex-col border p-6 md:static md:w-[25rem]"
 			>
 				<button
 					title="Copy link"
@@ -91,17 +111,59 @@
 					{data.gameId}
 				</button>
 
-				<Separator class="my-3"></Separator>
+				<Tabs.Root
+					value="info"
+					class="flex h-full flex-col overflow-hidden"
+					activateOnFocus={false}
+				>
+					<Tabs.List class="mt-2 w-full">
+						<Tabs.Trigger value="info" class="flex-1">Info</Tabs.Trigger>
+						<Tabs.Trigger value="chat" class="flex-1">Chat</Tabs.Trigger>
+					</Tabs.List>
+					<Tabs.Content value="info">
+						{#if gameData.rematches > 0}
+							<h1 class="font-semibold">Rematches: {gameData.rematches}</h1>
+						{/if}
+						<h1 class="font-semibold">Players</h1>
+						{#each players as player}
+							<h1>{player}</h1>
+						{/each}
+					</Tabs.Content>
+					<Tabs.Content value="chat" class="h-full overflow-hidden">
+						<div class="flex h-full flex-col">
+							<div class="h-full divide-y overflow-y-scroll" id="messages">
+								{#each messages as message}
+									<div class="flex gap-x-2 py-2 last:pb-4">
+										<img
+											src={`https://avatar.vercel.sh/${message.sender}?size=40`}
+											alt="avatar"
+											class="mt-1 self-start rounded-full"
+											height="40"
+											width="40"
+										/>
+										<div>
+											<h1 class="font-semibold">{message.sender}</h1>
+											<h1>{message.content}</h1>
+										</div>
+									</div>
+								{/each}
+							</div>
+							<div class="flex gap-x-2">
+								<Input
+									class="mt-auto focus-visible:ring-transparent "
+									placeholder="message"
+									bind:value={messageContent}
+									on:keydown={(e) => {
+										if (e.key == 'Enter') sendMessage();
+									}}
+								/>
+								<Button variant="secondary" on:click={sendMessage}>Send</Button>
+							</div>
+						</div>
+					</Tabs.Content>
+				</Tabs.Root>
 
-				{#if gameData.rematches > 0}
-					<h1 class="font-semibold">Rematches: {gameData.rematches}</h1>
-				{/if}
-				<h1 class="font-semibold">Players</h1>
-				{#each players as player}
-					<h1>{player}</h1>
-				{/each}
-
-				<div class="mt-auto flex w-full justify-between">
+				<div class="mt-auto flex w-full justify-between pt-4">
 					<a href="/">home</a>
 					<a href="https://github.com/skearya/ttt">
 						<Github size="25" />

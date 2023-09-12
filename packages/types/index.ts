@@ -1,11 +1,13 @@
 interface ServerToClientEvents {
     players: (map: Array<string>) => void;
     data: (game: GameData) => void;
+    message: (message: { sender: string; content: string }) => void;
     error: (msg: string) => void;
 }
 
 interface ClientToServerEvents {
     boardUpdate: (update: { row: number; col: number }) => void;
+    messageSend: (content: string) => void;
     rematch: () => void;
 }
 

@@ -27,7 +27,7 @@
 				message: string;
 		  };
 
-	async function createRoom() {
+	async function createRoom(): Promise<void> {
 		if (roomName == '') {
 			toast.warning('Input is empty');
 			return;
@@ -62,7 +62,7 @@
 		}
 	}
 
-	function setUsername() {
+	function setUsername(): void {
 		localStorage.setItem('username', usernameInput);
 		usernameDialog = false;
 	}
